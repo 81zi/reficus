@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Source moved to `src/`; manifest commands run `src/reficus.py`.
+- Plugin commands run with `python3 -B`, so no `__pycache__` is written
+  into the plugin directory.
+- herdr API client: connection failures and timeouts raise a clean
+  `HerdrError`, responses are matched to the request id, and the socket is
+  always closed. Tests added for the client.
+- README: new Security section (what Reficus reads, writes and runs).
+
 ## 0.4.0 — first public release
 
 - Plugin id is now `81zi.reficus` (was `local.reficus`). Settings, runtime

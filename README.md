@@ -41,11 +41,12 @@ resize key.
 14. [Actions, CLI and keybindings](#actions-cli-and-keybindings)
 15. [Recipes](#recipes)
 16. [Files](#files)
-17. [Troubleshooting](#troubleshooting)
-18. [Limitations](#limitations)
-19. [Uninstall](#uninstall)
-20. [Contributing](#contributing)
-21. [License](#license)
+17. [Security](#security)
+18. [Troubleshooting](#troubleshooting)
+19. [Limitations](#limitations)
+20. [Uninstall](#uninstall)
+21. [Contributing](#contributing)
+22. [License](#license)
 
 ---
 
@@ -569,7 +570,7 @@ description = "reficus: open settings popup"
   the popup.
 - Unbinding the popup's own key asks for confirmation; afterwards reopen it
   with `herdr plugin action invoke 81zi.reficus.settings`.
-- **First run:** the `[[startup]]` hook (`reficus.py ensure-keys`) writes
+- **First run:** the `[[startup]]` hook (`src/reficus.py ensure-keys`) writes
   the default bindings once, skipping keys that are taken, then sets
   `keybindings_initialized` so it never overrides your later choices.
 
@@ -615,13 +616,14 @@ Popup: *Strategy* → `fixed`, *Fixed cols* → 120, *Fixed rows* → 50, then
 ```
 reficus/
   herdr-plugin.toml   manifest: startup + event hooks, actions, popup pane
-  reficus.py          entry point; dispatches hook/action commands
-  core.py             reads herdr state, applies ratios, manual-resize modes
-  engine.py           pure layout maths (weights, strategies, constraints)
-  settings.py         config defaults, migration, profiles, state + locks
-  settings_tui.py     curses settings popup
-  keys.py             keybinding block in herdr's config.toml
-  herdr_api.py        tiny socket client for the herdr API
+  src/
+    reficus.py        entry point; dispatches hook/action commands
+    core.py           reads herdr state, applies ratios, manual-resize modes
+    engine.py         pure layout maths (weights, strategies, constraints)
+    settings.py       config defaults, migration, profiles, state + locks
+    settings_tui.py   curses settings popup
+    keys.py           keybinding block in herdr's config.toml
+    herdr_api.py      tiny socket client for the herdr API
   tests/              unit tests (python3 -m unittest discover -s tests)
   docs/               demo.gif and the VHS script that records it
   README.md           this file
@@ -650,6 +652,35 @@ cfg = settings.effective(settings.DEFAULTS)
 print(engine.Planner(cfg, "C", {}).plan(S("right", P("A"), S("down", P("B"), P("C"))), 200, 60))
 # {(): 0.35, (True,): 0.35}
 ```
+
+---
+
+## Security
+
+herdr does not sandbox or review plugins: Reficus runs as you, with your
+permissions. Read `herdr-plugin.toml` and `src/` before installing — herdr
+shows the manifest and every command it will run in the install preview.
+
+What Reficus touches:
+
+- **herdr API** — over `$HERDR_SOCKET_PATH`, only for reading panes, tabs
+  and layouts, setting split ratios, zoom, opening its own popup, showing
+  toasts and reloading config. It never sends input to panes or reads
+  their output. Process rules read each pane's agent and foreground process
+  name and command line to match against your patterns; these are not
+  stored.
+- **Files it writes** — its own `config.json` and `state.json`, and the
+  marked keybinding block in `~/.config/herdr/config.toml`, with backups
+  (see [Files](#files) and [Keybindings](#keybindings)). Nothing is written
+  into the plugin directory.
+- **Commands it runs** — only `python3` with the scripts in `src/`, started
+  by herdr with `-E -s -B` so `PYTHON*` variables and user site-packages
+  can't inject code and no bytecode is written next to the scripts. It starts no other programs and no background processes.
+- **Network** — none. No telemetry, no update checks.
+
+Report security issues privately through
+[GitHub security advisories](https://github.com/81zi/reficus/security/advisories/new)
+rather than a public issue.
 
 ---
 
@@ -692,7 +723,7 @@ already set):
 cd /path/to/reficus   # the plugin directory shown by `herdr plugin list`
 HERDR_PLUGIN_EVENT=pane.focused \
 HERDR_PLUGIN_EVENT_JSON='{"pane_id":"w1:p2"}' \
-python3 -E -s reficus.py hook
+python3 -E -s -B src/reficus.py hook
 ```
 
 ---
@@ -709,7 +740,9 @@ python3 -E -s reficus.py hook
   extend it. They are set in the Reficus popup and written to config.toml.
 - **Conflict checks need Python ≥ 3.11** (`tomllib`) to read your custom
   bindings; on older Python only herdr's defaults are checked.
-- macOS and Linux only (Unix socket, `fcntl` locks).
+- macOS and Linux only (Unix socket, `fcntl` locks). Reficus uses the raw
+  socket API rather than the `herdr` CLI because the CLI has no command to
+  read the split tree or set an absolute split ratio.
 
 ---
 

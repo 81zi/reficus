@@ -242,7 +242,7 @@ def write(bindings):
     _write_atomic(path, new_text)
     try:
         result = rpc("server.reload_config")
-    except (HerdrError, OSError) as exc:
+    except HerdrError as exc:
         result = {"diagnostics": [str(exc)]}
     diagnostics = result.get("diagnostics") or []
     if diagnostics:
@@ -250,7 +250,7 @@ def write(bindings):
             _write_atomic(path, original)
             try:
                 rpc("server.reload_config")
-            except (HerdrError, OSError):
+            except HerdrError:
                 pass
         raise ValueError("herdr rejected the config, restored backup: %s" % diagnostics)
     return "keybindings saved, herdr config reloaded", bindings
