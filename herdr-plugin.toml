@@ -1,0 +1,72 @@
+id = "81zi.reficus"
+name = "Reficus"
+version = "0.4.0"
+min_herdr_version = "0.8.2"
+description = "Grow the focused pane and shrink the others on every focus change"
+platforms = ["linux", "macos"]
+
+# -E -s: ignore PYTHON* env and user site-packages, but keep the plugin
+# directory on sys.path for the sibling modules.
+
+[[startup]]
+command = ["python3", "-E", "-s", "reficus.py", "ensure-keys"]
+
+[[events]]
+on = "pane.focused"
+command = ["python3", "-E", "-s", "reficus.py", "hook"]
+
+[[events]]
+on = "pane.created"
+command = ["python3", "-E", "-s", "reficus.py", "hook"]
+
+[[events]]
+on = "pane.closed"
+command = ["python3", "-E", "-s", "reficus.py", "hook"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "-E", "-s", "reficus.py", "hook"]
+
+[[panes]]
+id = "settings"
+title = "Reficus settings"
+placement = "popup"
+width = 78
+height = 46
+command = ["python3", "-E", "-s", "reficus.py", "settings"]
+
+[[actions]]
+id = "settings"
+title = "Reficus: settings"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "open-settings"]
+
+[[actions]]
+id = "toggle"
+title = "Reficus: toggle on/off"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "toggle"]
+
+[[actions]]
+id = "cycle-profile"
+title = "Reficus: next profile"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "cycle-profile"]
+
+[[actions]]
+id = "resume"
+title = "Reficus: resume this tab"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "resume"]
+
+[[actions]]
+id = "restore"
+title = "Reficus: restore saved layout and pause tab"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "restore"]
+
+[[actions]]
+id = "equalize"
+title = "Reficus: equalize current tab"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "reficus.py", "equalize"]
