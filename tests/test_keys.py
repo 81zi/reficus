@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 from helpers import TempEnv
@@ -53,11 +54,15 @@ class KeysTest(TempEnv):
         self.assertIsNotNone(keys.validate("prefix+shift"))
         self.assertIsNotNone(keys.validate("bad key\""))
 
-    def test_conflict_with_herdr_default_and_custom_command(self):
+    def test_conflict_with_herdr_default(self):
         self.set_config(USER_CONFIG)
         self.assertIn("zoom", keys.conflict("toggle", "prefix+z", {}))
-        self.assertIn("custom command", keys.conflict("toggle", "prefix+y", {}))
         self.assertIsNone(keys.conflict("toggle", "prefix+shift+z", {}))
+
+    @unittest.skipIf(sys.version_info < (3, 11), "custom bindings need tomllib")
+    def test_conflict_with_custom_command(self):
+        self.set_config(USER_CONFIG)
+        self.assertIn("custom command", keys.conflict("toggle", "prefix+y", {}))
 
     def test_write_adopts_hand_written_legacy_binding(self):
         self.set_config(USER_CONFIG)
