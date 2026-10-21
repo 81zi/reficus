@@ -1,8 +1,18 @@
-# Reficus — herdr plugin
+<p align="center">
+  <img src="docs/logo.svg" width="120" height="120" alt="Reficus logo: a ficus leaf beside two smaller leaves, above a pot">
+</p>
 
-Automatically resizes [herdr](https://herdr.dev) panes so the pane you are
-working in is large and the rest step back — without you ever touching a
-resize key.
+<h1 align="center">Reficus</h1>
+
+<p align="center"><b>Focus up front.</b> Ficus in the back.</p>
+
+<p align="center"><code>open-source terminal plugin · the pane you're in grows, the rest quietly shrink</code></p>
+
+---
+
+Reficus is a plugin for [herdr](https://herdr.dev). It automatically
+resizes herdr panes so the pane you are working in is large and the rest
+step back — without you ever touching a resize key.
 
 ![Reficus resizing herdr panes as focus moves](docs/demo.gif)
 

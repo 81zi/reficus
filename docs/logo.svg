@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="168" height="168" viewBox="40 40 168 168"><defs/><g/><g/><g/><g/><g/><g/><g/><g id="div1"><g><rect width="168" height="168" x="40" y="40" fill="rgb(14, 21, 18)" rx="38" ry="38"/></g><g id="svg1" role="img" mask="url(#mask-for-svg11)"><g/><g/><g/><g/><g/><g/><g/><mask id="mask-for-svg11"><rect width="120" height="120" x="64" y="64" fill="#ffffff"/></mask><g transform="matrix(1.875, 0, 0, 1.875, 64, 64)">
+          <path d="M20 6H36A2 2 0 0 1 38 8V24A12 12 0 0 1 26 36H10A2 2 0 0 1 8 34V18A12 12 0 0 1 20 6Z" fill="rgb(63, 224, 123)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+          <path d="M42.5 6H50A6 6 0 0 1 56 12V18.5A1.5 1.5 0 0 1 54.5 20H47A6 6 0 0 1 41 14V7.5A1.5 1.5 0 0 1 42.5 6Z" fill="rgb(74, 98, 83)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+          <path d="M42.5 22H50A6 6 0 0 1 56 28V34.5A1.5 1.5 0 0 1 54.5 36H47A6 6 0 0 1 41 30V23.5A1.5 1.5 0 0 1 42.5 22Z" fill="rgb(60, 80, 69)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+          <rect x="30.5" y="34" width="3" height="10" fill="rgb(111, 138, 121)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+          <rect x="19" y="43" width="26" height="4" rx="1" fill="rgb(143, 168, 152)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+          <path d="M22 48H42L40 58H24Z" fill="rgb(111, 138, 121)" alignment-baseline="baseline" color="rgb(14, 21, 18)" stroke="none"/>
+        </g></g></g></svg>
