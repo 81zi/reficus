@@ -18,7 +18,7 @@ import re
 import shutil
 import tempfile
 
-from herdr_api import LEGACY_PLUGIN_ID, PLUGIN_ID, HerdrError, rpc
+from herdr_api import LEGACY_PLUGIN_IDS, PLUGIN_ID, HerdrError, rpc
 
 BLOCK_START = "# >>> reficus keybindings (managed by the Reficus plugin: edit them in its popup) >>>"
 BLOCK_END = "# <<< reficus keybindings <<<"
@@ -123,8 +123,8 @@ def conflict(action, key, bindings):
 
 
 def _action_of(command):
-    """Action name of a `<plugin id>.<action>` command, for our current or legacy id."""
-    for plugin_id in (PLUGIN_ID, LEGACY_PLUGIN_ID):
+    """Action name of a `<plugin id>.<action>` command, for our current or an earlier id."""
+    for plugin_id in (PLUGIN_ID,) + LEGACY_PLUGIN_IDS:
         if command.startswith(plugin_id + "."):
             return command[len(plugin_id) + 1:]
     return None
@@ -187,11 +187,12 @@ def render_block(bindings):
 
 def has_reficus_binding():
     text = _read_text()
-    return BLOCK_START in text or any('"%s.' % i in text for i in (PLUGIN_ID, LEGACY_PLUGIN_ID))
+    return BLOCK_START in text or any('"%s.' % i in text for i in (PLUGIN_ID,) + LEGACY_PLUGIN_IDS)
 
 
 def has_legacy_binding():
-    return ('"%s.' % LEGACY_PLUGIN_ID) in _read_text()
+    text = _read_text()
+    return any('"%s.' % i in text for i in LEGACY_PLUGIN_IDS)
 
 
 def adopt(bindings):
@@ -222,8 +223,6 @@ def write(bindings):
     """Rewrite the managed block and reload herdr.
 
     Returns (status message, bindings actually written)."""
-    # Write through a symlink (dotfiles setups) instead of replacing it.
-    path = os.path.realpath(config_toml_path())
     original = _read_text()
     lines, _ = _strip_ours(original)
     bindings = adopt(bindings)
@@ -231,9 +230,24 @@ def write(bindings):
         lines.append("")
     if any(bindings.values()):
         lines += render_block(bindings)
-    new_text = "\n".join(lines) + "\n"
+    return _replace(original, "\n".join(lines) + "\n", "keybindings saved"), bindings
+
+
+def remove():
+    """Remove the managed block and hand-written Reficus bindings. Returns a status message."""
+    original = _read_text()
+    if not original:
+        return "keybindings unchanged"
+    lines, _ = _strip_ours(original)
+    return _replace(original, "\n".join(lines) + "\n" if lines else "", "keybindings removed")
+
+
+def _replace(original, new_text, done):
+    """Write config.toml (with backups) and reload herdr; restore on rejection."""
+    # Write through a symlink (dotfiles setups) instead of replacing it.
+    path = os.path.realpath(config_toml_path())
     if new_text == original:
-        return "keybindings unchanged", bindings
+        return "keybindings unchanged"
     if original:
         if not os.path.exists(path + ".reficus-original"):
             shutil.copyfile(path, path + ".reficus-original")
@@ -253,4 +267,4 @@ def write(bindings):
             except HerdrError:
                 pass
         raise ValueError("herdr rejected the config, restored backup: %s" % diagnostics)
-    return "keybindings saved, herdr config reloaded", bindings
+    return done + ", herdr config reloaded"

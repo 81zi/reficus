@@ -1,6 +1,6 @@
-id = "81zi.reficus"
+id = "reficus"
 name = "Reficus"
-version = "0.4.0"
+version = "0.5.0"
 min_herdr_version = "0.8.2"
 description = "Grow the focused pane and shrink the others on every focus change"
 platforms = ["linux", "macos"]
@@ -71,3 +71,9 @@ id = "equalize"
 title = "Reficus: equalize current tab"
 contexts = ["workspace"]
 command = ["python3", "-E", "-s", "-B", "src/reficus.py", "equalize"]
+
+[[actions]]
+id = "cleanup"
+title = "Reficus: clean up and disable (before uninstall)"
+contexts = ["workspace"]
+command = ["python3", "-E", "-s", "-B", "src/reficus.py", "cleanup"]

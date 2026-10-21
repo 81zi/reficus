@@ -13,7 +13,7 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 
-from herdr_api import LEGACY_PLUGIN_ID, PLUGIN_ID
+from herdr_api import LEGACY_PLUGIN_IDS, PLUGIN_ID
 
 STRATEGIES = ["weighted", "golden", "fixed", "accordion", "ancestors", "equal"]
 AXES = ["both", "horizontal", "vertical"]
@@ -83,14 +83,26 @@ RULE_DEFAULTS = {
 }
 
 
+CONFIG_DIR = ("HERDR_PLUGIN_CONFIG_DIR", "~/.config/herdr/plugins/config", "config.json")
+STATE_DIR = ("HERDR_PLUGIN_STATE_DIR", "~/.local/state/herdr/plugins", "state.json")
+
+
+def _plugin_dirs(env_key, fallback_parent):
+    """This plugin's config/state dir, then the dirs of earlier plugin ids next to it."""
+    directory = os.environ.get(env_key) or os.path.join(os.path.expanduser(fallback_parent), PLUGIN_ID)
+    parent = os.path.dirname(os.path.abspath(directory))
+    legacy = [os.path.join(parent, i) for i in LEGACY_PLUGIN_IDS]
+    return directory, [d for d in legacy if d != os.path.abspath(directory)]
+
+
 def _plugin_file(env_key, fallback_parent, name):
     """Path of `name` in this plugin's config/state dir. The first time it is
-    missing, a copy is taken from the pre-release `local.reficus` dir next to it."""
-    directory = os.environ.get(env_key) or os.path.join(os.path.expanduser(fallback_parent), PLUGIN_ID)
+    missing, a copy is taken from the newest earlier plugin id that has one."""
+    directory, legacy_dirs = _plugin_dirs(env_key, fallback_parent)
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, name)
-    legacy = os.path.join(os.path.dirname(os.path.abspath(directory)), LEGACY_PLUGIN_ID, name)
-    if not os.path.exists(path) and os.path.exists(legacy) and os.path.abspath(legacy) != os.path.abspath(path):
+    legacy = next((p for p in (os.path.join(d, name) for d in legacy_dirs) if os.path.exists(p)), None)
+    if not os.path.exists(path) and legacy:
         fd, tmp = tempfile.mkstemp(dir=directory, prefix=".tmp-")
         os.close(fd)
         shutil.copyfile(legacy, tmp)
@@ -99,11 +111,28 @@ def _plugin_file(env_key, fallback_parent, name):
 
 
 def config_path():
-    return _plugin_file("HERDR_PLUGIN_CONFIG_DIR", "~/.config/herdr/plugins/config", "config.json")
+    return _plugin_file(*CONFIG_DIR)
 
 
 def state_path():
-    return _plugin_file("HERDR_PLUGIN_STATE_DIR", "~/.local/state/herdr/plugins", "state.json")
+    return _plugin_file(*STATE_DIR)
+
+
+def remove_data():
+    """Delete config and state, including copies left under earlier plugin ids.
+    Only Reficus' own files are removed; a directory is removed once empty."""
+    for env_key, fallback_parent, name in (CONFIG_DIR, STATE_DIR):
+        directory, legacy_dirs = _plugin_dirs(env_key, fallback_parent)
+        for d in [directory] + legacy_dirs:
+            if not os.path.isdir(d):
+                continue
+            for entry in os.listdir(d):
+                if entry.startswith(name) or entry.startswith(".tmp-"):
+                    os.remove(os.path.join(d, entry))
+            try:
+                os.rmdir(d)
+            except OSError:
+                pass
 
 
 def _read_json(path):

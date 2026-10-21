@@ -6,8 +6,9 @@ import re
 import time
 
 import engine
+import keys
 import settings
-from herdr_api import HerdrError, find_key, rpc, toast
+from herdr_api import PLUGIN_ID, HerdrError, find_key, rpc, toast
 
 MANUAL_TOLERANCE = 0.01
 APPLY_TOLERANCE = 0.004
@@ -261,3 +262,14 @@ def restore_all():
 
 def set_paused(tab_id, paused):
     update_tab(tab_id, paused=paused)
+
+
+def cleanup():
+    """Undo what Reficus changed before `herdr plugin uninstall`: restore saved
+    layouts, remove its keybindings, disable it so no hook recreates state,
+    then delete its config and state. Returns a status message."""
+    restore_all()
+    message = keys.remove()
+    rpc("plugin.disable", {"plugin_id": PLUGIN_ID})
+    settings.remove_data()
+    return "layouts restored, %s, plugin disabled, settings deleted" % message

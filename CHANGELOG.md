@@ -1,7 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
 
+- Plugin id is now `reficus` (was `81zi.reficus`), so action names and
+  paths don't carry the GitHub owner: `reficus.settings`, `reficus.toggle`,
+  … Settings, state and keybindings from `81zi.reficus` and `local.reficus`
+  are migrated automatically. The install source stays `81zi/reficus`.
+- New `reficus.cleanup` action (also in the popup): restores layouts,
+  removes Reficus keybindings from config.toml, disables the plugin and
+  deletes its config and state, so `herdr plugin uninstall reficus` leaves
+  nothing behind.
 - Source moved to `src/`; manifest commands run `src/reficus.py`.
 - Plugin commands run with `python3 -B`, so no `__pycache__` is written
   into the plugin directory.

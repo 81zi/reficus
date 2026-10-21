@@ -6,6 +6,7 @@ Usage: reficus.py <command>
   settings        settings TUI (runs inside the popup)
   ensure-keys     startup: write the default keybindings once
   toggle | equalize | resume | restore | cycle-profile
+  cleanup         undo all changes and disable, before `herdr plugin uninstall`
 """
 
 import json
@@ -84,6 +85,11 @@ def restore():
     toast("Reficus paused", "Layout restored." if ok else "No saved layout for this tab.")
 
 
+def cleanup():
+    print(core.cleanup())
+    toast("Reficus cleaned up and disabled", "Finish with: herdr plugin uninstall " + PLUGIN_ID)
+
+
 def ensure_keys():
     """Startup: put the default bindings into config.toml (once), and move
     bindings that still call the pre-release plugin id to the current one."""
@@ -113,6 +119,7 @@ COMMANDS = {
     "restore": restore,
     "cycle-profile": cycle_profile,
     "ensure-keys": ensure_keys,
+    "cleanup": cleanup,
 }
 
 

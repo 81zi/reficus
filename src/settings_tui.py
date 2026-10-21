@@ -60,6 +60,9 @@ MAIN_ROWS = [
     ("Keybindings (enter to set, empty = none)", [
         row(action, keys.ACTION_LABELS[action], "key") for action in settings.KEY_ACTIONS
     ]),
+    ("Uninstall", [
+        row("cleanup", "Clean up and disable…", "cleanup"),
+    ]),
 ]
 
 RULE_ROWS = [
@@ -115,7 +118,7 @@ class App:
         kind = r["kind"]
         if kind == "profile":
             return self.profile_label()
-        if kind in PROFILE_ACTIONS:
+        if kind in PROFILE_ACTIONS or kind == "cleanup":
             return ""
         if kind == "key":
             return self.cfg["keybindings"].get(r["key"]) or "—"
@@ -162,6 +165,8 @@ class App:
             self.profile_action(kind)
         elif kind == "key":
             self.edit_key(r["key"])
+        elif kind == "cleanup":
+            self.cleanup()
         elif kind == "rules":
             self.rules_screen()
         elif kind == "list":
@@ -259,6 +264,18 @@ class App:
         self.cfg["keybindings_initialized"] = True
         settings.save_config(self.cfg)
         self.status = message
+
+    # ---- uninstall ---------------------------------------------------
+    def cleanup(self):
+        if not self.confirm("Undo all changes, disable Reficus and delete its settings?"):
+            return
+        try:
+            core.cleanup()
+        except Exception as exc:
+            self.status = "clean-up failed: %s" % exc
+            return
+        self.prompt("Done. Run: herdr plugin uninstall %s  (enter) " % keys.PLUGIN_ID, "")
+        raise SystemExit
 
     # ---- prompts -----------------------------------------------------
     def prompt(self, label, initial):

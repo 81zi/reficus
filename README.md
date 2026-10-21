@@ -16,7 +16,7 @@ resize key.
 └──────────────────┴────────┘      └────────┴──────────────────┘
 ```
 
-- **Plugin id:** `81zi.reficus`
+- **Plugin id:** `reficus`
 - **Requires:** herdr ≥ 0.8.2, `python3` ≥ 3.9 on herdr's `PATH`, macOS or Linux
 - **Dependencies:** none (Python standard library only)
 - **Settings popup:** `prefix+shift+f`
@@ -91,14 +91,14 @@ herdr plugin list            # check it is enabled and has no warnings
 ```
 
 herdr shows a preview of the manifest and the commands it will run before
-installing. Update later with `herdr plugin update 81zi.reficus`.
+installing. Update later with `herdr plugin update reficus`.
 
 On the next herdr server start, the plugin's startup hook adds the default
 keybinding (`prefix+shift+f` → settings popup) to `~/.config/herdr/config.toml`
 once, unless that key is taken. Until then, open the popup with:
 
 ```bash
-herdr plugin action invoke 81zi.reficus.settings
+herdr plugin action invoke reficus.settings
 ```
 
 After that, change keys in the popup's **Keybindings** section — see
@@ -114,20 +114,21 @@ git clone https://github.com/81zi/reficus.git
 herdr plugin link ./reficus
 ```
 
-### Upgrading from `local.reficus`
+### Upgrading from an earlier plugin id
 
-Versions before 0.4.0 used the plugin id `local.reficus`. Unlink it, then
-install or link this version:
+Earlier versions used the plugin id `81zi.reficus` (0.4.0) or
+`local.reficus` (before 0.4.0). Remove the old one, then install this
+version:
 
 ```bash
-herdr plugin unlink local.reficus
+herdr plugin uninstall 81zi.reficus   # or: herdr plugin unlink local.reficus
 herdr plugin install 81zi/reficus
 ```
 
-On first run your settings and per-tab state are copied from the
-`local.reficus` config and state directories (the old ones are left in place),
-and on the next server start keybindings that call `local.reficus.*` are
-rewritten to `81zi.reficus.*`.
+On first run your settings and per-tab state are copied from the old
+config and state directories (the old ones are left in place), and on the
+next server start keybindings that call `reficus.*` or
+`local.reficus.*` are rewritten to `reficus.*`.
 
 ---
 
@@ -229,7 +230,7 @@ Which to pick:
 
 ## Settings popup
 
-Open with `prefix+shift+f` (or `herdr plugin action invoke 81zi.reficus.settings`).
+Open with `prefix+shift+f` (or `herdr plugin action invoke reficus.settings`).
 
 ```
 Reficus settings
@@ -281,7 +282,7 @@ edit. In a rule, numeric fields can be unset: press `←` past the minimum, or
 
 ## Settings reference
 
-Stored in `~/.config/herdr/plugins/config/81zi.reficus/config.json`.
+Stored in `~/.config/herdr/plugins/config/reficus/config.json`.
 Missing keys use the defaults; the file only needs the keys you change.
 
 **Tunables** — the values below down to `idle_weight` are what a
@@ -520,16 +521,17 @@ All actions are available via CLI, keybinding, or the herdr action list.
 
 | Action id | What it does |
 |---|---|
-| `81zi.reficus.settings` | open the settings popup |
-| `81zi.reficus.toggle` | enable/disable (disable restores layouts) |
-| `81zi.reficus.cycle-profile` | switch to the next profile, toast the name |
-| `81zi.reficus.resume` | resume the current tab |
-| `81zi.reficus.restore` | restore the current tab's saved layout and pause it |
-| `81zi.reficus.equalize` | one-shot 50/50 for the current tab |
+| `reficus.settings` | open the settings popup |
+| `reficus.toggle` | enable/disable (disable restores layouts) |
+| `reficus.cycle-profile` | switch to the next profile, toast the name |
+| `reficus.resume` | resume the current tab |
+| `reficus.restore` | restore the current tab's saved layout and pause it |
+| `reficus.equalize` | one-shot 50/50 for the current tab |
+| `reficus.cleanup` | undo every change and disable, before uninstalling — see [Uninstall](#uninstall) |
 
 ```bash
-herdr plugin action invoke 81zi.reficus.toggle
-herdr plugin action list --plugin 81zi.reficus
+herdr plugin action invoke reficus.toggle
+herdr plugin action list --plugin reficus
 ```
 
 ### Keybindings
@@ -553,13 +555,13 @@ What it writes is a marked block the plugin owns:
 [[keys.command]]
 key = "prefix+shift+f"
 type = "plugin_action"
-command = "81zi.reficus.settings"
+command = "reficus.settings"
 description = "reficus: open settings popup"
 # <<< reficus keybindings <<<
 ```
 
 - Everything outside the block is left alone. Hand-written
-  `[[keys.command]]` entries that call `81zi.reficus.*` are moved into it.
+  `[[keys.command]]` entries that call `reficus.*` are moved into it.
 - Before each write the old file is copied to
   `~/.config/herdr/config.toml.reficus-backup`; the very first time, it is
   also copied to `config.toml.reficus-original`, which is never overwritten.
@@ -569,7 +571,7 @@ description = "reficus: open settings popup"
   `keybindings` in `config.json` and reopen the popup instead, or just use
   the popup.
 - Unbinding the popup's own key asks for confirmation; afterwards reopen it
-  with `herdr plugin action invoke 81zi.reficus.settings`.
+  with `herdr plugin action invoke reficus.settings`.
 - **First run:** the `[[startup]]` hook (`src/reficus.py ensure-keys`) writes
   the default bindings once, skipping keys that are taken, then sets
   `keybindings_initialized` so it never overrides your later choices.
@@ -631,13 +633,13 @@ reficus/
 
 | Path | Content |
 |---|---|
-| `~/.config/herdr/plugins/config/81zi.reficus/config.json` | your settings |
-| `~/.local/state/herdr/plugins/81zi.reficus/state.json` (`$HERDR_PLUGIN_STATE_DIR`) | runtime state: per-tab snapshots, last applied ratios, pauses, kept splits |
+| `~/.config/herdr/plugins/config/reficus/config.json` | your settings |
+| `~/.local/state/herdr/plugins/reficus/state.json` (`$HERDR_PLUGIN_STATE_DIR`) | runtime state: per-tab snapshots, last applied ratios, pauses, kept splits |
 | `~/.config/herdr/config.toml` (marked block) | Reficus keybindings |
 | `~/.config/herdr/config.toml.reficus-backup` | copy of config.toml before the last keybinding change |
 | `~/.config/herdr/config.toml.reficus-original` | copy of config.toml before Reficus first changed it |
 
-`herdr plugin config-dir 81zi.reficus` prints the config directory.
+`herdr plugin config-dir reficus` prints the config directory.
 Deleting `state.json` is safe — it resets pauses, kept splits and
 snapshots.
 
@@ -675,8 +677,11 @@ What Reficus touches:
   into the plugin directory.
 - **Commands it runs** — only `python3` with the scripts in `src/`, started
   by herdr with `-E -s -B` so `PYTHON*` variables and user site-packages
-  can't inject code and no bytecode is written next to the scripts. It starts no other programs and no background processes.
+    can't inject code and no bytecode is written next to the scripts. It
+  starts no other programs and no background processes.
 - **Network** — none. No telemetry, no update checks.
+- **Removal** — the `cleanup` action undoes all of the above; see
+  [Uninstall](#uninstall).
 
 Report security issues privately through
 [GitHub security advisories](https://github.com/81zi/reficus/security/advisories/new)
@@ -689,7 +694,7 @@ rather than a public issue.
 **Nothing resizes.**
 
 1. `herdr plugin list` → plugin `enabled`, no warnings.
-2. `herdr plugin log list --plugin 81zi.reficus` → look for `failed`
+2. `herdr plugin log list --plugin reficus` → look for `failed`
    entries and their `stderr`.
 3. Open the popup: is it `DISABLED` or `PAUSED`? Is scope excluding the tab?
 4. Single-pane and zoomed tabs are intentionally left alone.
@@ -749,16 +754,26 @@ python3 -E -s -B src/reficus.py hook
 ## Uninstall
 
 ```bash
-herdr plugin uninstall 81zi.reficus   # or `unlink` for a source checkout
-# optional: remove settings and state
-rm -rf "$(herdr plugin config-dir 81zi.reficus)" \
-       ~/.local/state/herdr/plugins/81zi.reficus
+herdr plugin action invoke reficus.cleanup
+herdr plugin uninstall reficus        # or `unlink` for a source checkout
 ```
 
-Before uninstalling, clear all keys in the popup (or delete the
-`# >>> reficus keybindings` … `# <<<` block from
-`~/.config/herdr/config.toml`) and reload with `herdr server reload-config`. The plugin directory itself
-is left in place; delete it if you no longer need it.
+`herdr plugin uninstall` only unregisters a plugin: by design herdr keeps
+its config and state, and plugins get no uninstall hook. So run the
+clean-up action first (also in the popup under **Uninstall**, or in herdr's
+action list). It:
+
+1. restores every tab's saved layout,
+2. removes the Reficus keybindings from `~/.config/herdr/config.toml` and
+   reloads it,
+3. disables the plugin so no hook runs again,
+4. deletes its `config.json` and `state.json` (and copies left under the
+   earlier ids `81zi.reficus` / `local.reficus`).
+
+It keeps `config.toml.reficus-original` and `config.toml.reficus-backup`
+next to your config as a safety net; delete them by hand if you like.
+Changed your mind? `herdr plugin enable reficus` starts again with default
+settings.
 
 ---
 

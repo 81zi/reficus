@@ -10,7 +10,7 @@ demo=$tmp/demo-project
 mkdir -p "$demo"
 printf '#!/bin/sh\nexec /bin/bash --noprofile --norc -i\n' > "$tmp/demo-shell"
 chmod +x "$tmp/demo-shell"
-config="$(herdr plugin config-dir 81zi.reficus)/config.json"
+config="$(herdr plugin config-dir reficus)/config.json"
 [ -f "$config" ] && cp "$config" "$tmp/config.json"
 reset_session() {
     herdr session stop reficus-demo >/dev/null 2>&1 || true

@@ -72,10 +72,33 @@ class KeysTest(TempEnv):
         text = self.config()
         self.assertNotIn("local.reficus", text)
         self.assertNotIn("my toggle for reficus", text)
-        self.assertIn('command = "81zi.reficus.toggle"', text)
-        self.assertIn('command = "81zi.reficus.settings"', text)
+        self.assertIn('command = "reficus.toggle"', text)
+        self.assertIn('command = "reficus.settings"', text)
         self.assertIn('command = "echo hi"', text)
         self.assertEqual(self.reloads, ["server.reload_config"])
+
+    def test_write_migrates_previous_id(self):
+        self.set_config('[[keys.command]]\nkey = "prefix+shift+f"\ntype = "plugin_action"\n'
+                        'command = "81zi.reficus.settings"\n')
+        self.assertTrue(keys.has_legacy_binding())
+        keys.write({})
+        self.assertNotIn("81zi", self.config())
+        self.assertIn('command = "reficus.settings"', self.config())
+
+    def test_remove_keeps_everything_else(self):
+        self.set_config(USER_CONFIG)
+        keys.write({"settings": "prefix+shift+f"})
+        self.assertIn("removed", keys.remove())
+        text = self.config()
+        self.assertNotIn(keys.BLOCK_START, text)
+        self.assertNotIn("reficus.", text)
+        self.assertIn("sidebar = true", text)
+        self.assertIn('command = "echo hi"', text)
+        self.assertEqual(keys.remove(), "keybindings unchanged")
+
+    def test_remove_without_config(self):
+        self.assertEqual(keys.remove(), "keybindings unchanged")
+        self.assertFalse(os.path.exists(self.path))
 
     def test_rewrite_is_idempotent_and_unbinds(self):
         keys.write({"settings": "prefix+shift+f"})

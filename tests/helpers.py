@@ -22,8 +22,8 @@ class TempEnv(unittest.TestCase):
         self.root = self._tmp.name
         self._env = dict(os.environ)
         os.environ["XDG_CONFIG_HOME"] = os.path.join(self.root, "xdg")
-        os.environ["HERDR_PLUGIN_CONFIG_DIR"] = os.path.join(self.root, "config", "81zi.reficus")
-        os.environ["HERDR_PLUGIN_STATE_DIR"] = os.path.join(self.root, "state", "81zi.reficus")
+        os.environ["HERDR_PLUGIN_CONFIG_DIR"] = os.path.join(self.root, "config", "reficus")
+        os.environ["HERDR_PLUGIN_STATE_DIR"] = os.path.join(self.root, "state", "reficus")
 
     def tearDown(self):
         os.environ.clear()

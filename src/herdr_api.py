@@ -10,9 +10,9 @@ import json
 import os
 import socket
 
-PLUGIN_ID = os.environ.get("HERDR_PLUGIN_ID", "81zi.reficus")
-# Id used before the public release; settings and keybindings are migrated.
-LEGACY_PLUGIN_ID = "local.reficus"
+PLUGIN_ID = os.environ.get("HERDR_PLUGIN_ID", "reficus")
+# Ids of earlier releases, newest first; settings and keybindings are migrated.
+LEGACY_PLUGIN_IDS = ("81zi.reficus", "local.reficus")
 
 TIMEOUT = 5
 

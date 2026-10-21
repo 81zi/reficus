@@ -25,6 +25,27 @@ class SettingsTest(TempEnv):
         self.assertIn("t", settings.read_state()["tabs"])
         self.assertTrue(os.path.exists(settings.config_path()))
 
+    def test_newest_previous_id_wins(self):
+        self.write_json(os.path.join(self.root, "config", "local.reficus", "config.json"), {"ratio": 0.8})
+        self.write_json(os.path.join(self.root, "config", "81zi.reficus", "config.json"), {"ratio": 0.9})
+        self.assertEqual(settings.load_config()["ratio"], 0.9)
+
+    def test_remove_data(self):
+        settings.save_config(settings.load_config())
+        with settings.locked_state() as state:
+            state["tabs"]["t1"] = {}
+        with settings.apply_lock():
+            pass
+        legacy = os.path.join(self.root, "config", "81zi.reficus", "config.json")
+        self.write_json(legacy, {"ratio": 0.9})
+        other = os.path.join(self.root, "state", "reficus", "notes.txt")
+        with open(other, "w") as f:
+            f.write("not ours")
+        settings.remove_data()
+        self.assertFalse(os.path.exists(os.environ["HERDR_PLUGIN_CONFIG_DIR"]))
+        self.assertFalse(os.path.exists(os.path.dirname(legacy)))
+        self.assertEqual(os.listdir(os.environ["HERDR_PLUGIN_STATE_DIR"]), ["notes.txt"])
+
     def test_existing_config_is_not_overwritten_by_legacy(self):
         self.write_json(settings.config_path(), {"ratio": 0.7})
         self.write_json(os.path.join(self.root, "config", "local.reficus", "config.json"), {"ratio": 0.8})
