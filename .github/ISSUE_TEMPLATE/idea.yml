@@ -1,0 +1,16 @@
+name: Feature or change proposal
+description: Suggest a feature or a change (pull requests are collaborators-only, so propose it here)
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How it could work. A sketch, config example or diff is welcome.

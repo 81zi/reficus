@@ -1,0 +1,30 @@
+name: Bug report
+description: Something doesn't resize or behave as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: layout
+    attributes:
+      label: Layout and settings
+      description: Pane layout (a quick sketch is fine), active profile/strategy and any changed settings from config.json.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Reficus, herdr, python3 and OS
+      placeholder: reficus 0.5.0, herdr 0.8.2, Python 3.12, macOS 15
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `herdr plugin log list --plugin reficus`, if anything failed.
+      render: text

@@ -71,6 +71,6 @@ herdr plugin uninstall reficus
 
 - [Reference](docs/reference.md): settings, rules, keybindings, troubleshooting
 - [Security](docs/reference.md#security): Reficus runs as you, never reads pane output, and makes no network calls. Report issues through [security advisories](https://github.com/81zi/reficus/security/advisories/new).
-- Contributing: PRs are welcome. Use only the standard library, and run `python3 -m unittest discover -s tests` before sending a change.
+- [Contributing](CONTRIBUTING.md): bugs and ideas go in [issues](https://github.com/81zi/reficus/issues/new/choose). Pull requests are limited to collaborators.
 
 [MIT](LICENSE)
