@@ -4,6 +4,8 @@ Automatically resizes [herdr](https://herdr.dev) panes so the pane you are
 working in is large and the rest step back — without you ever touching a
 resize key.
 
+![Reficus resizing herdr panes as focus moves](docs/demo.gif)
+
 ```
  focus on left                      focus on bottom-right
 ┌──────────────────┬────────┐      ┌────────┬──────────────────┐
@@ -621,6 +623,7 @@ reficus/
   keys.py             keybinding block in herdr's config.toml
   herdr_api.py        tiny socket client for the herdr API
   tests/              unit tests (python3 -m unittest discover -s tests)
+  docs/               demo.gif and the VHS script that records it
   README.md           this file
 ```
 
